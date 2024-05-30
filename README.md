@@ -5,8 +5,8 @@ TODO:
 
 - [x] Authentisierung mit JWT
 - [x] CRUD Basisfunktionen Backend
-- [] CRUD Frontend
-- [] Wochenübersicht
+- [ ] CRUD Frontend
+- [ ] Wochenübersicht
 - [X] Tasks mit mehreren Usern
-- [] Historie Übersicht
-- [] Wöchentlicher Task Score
+- [ ] Historie Übersicht
+- [ ] Wöchentlicher Task Score
