@@ -1,0 +1,16 @@
+POST http://localhost:8080/api/v1/User
+Content-Type: application/json
+
+{
+  "name": "bilal",
+  "email": "bilal.lila@gmx.de",
+  "birthday": "2004-12-19"
+}
+
+
+####
+DELETE http://localhost:8080/api/v1/student/4
+
+
+###
+PUT http://localhost:8080/api/v1/student/3?name=Maria&
