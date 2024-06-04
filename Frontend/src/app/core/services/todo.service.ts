@@ -11,7 +11,7 @@ import {ILoginResponse, IUser} from "../models/auth.mode";
   providedIn: 'root',
 })
 export class TodoService {
-  constructor(private http: HttpClient, private tokenService: TokenService) {}
+  constructor(private http: HttpClient, private tokenService: TokenService, private authService: AuthService) {}
 
   getAllTodo(status: string): Observable<IResponse<ITodo[]>> {
     let queryString = '';
@@ -30,14 +30,15 @@ export class TodoService {
     );
   }
 
-  getWeeklyTasksByUserId(userId: number, startDate: string, endDate: string): Observable<IResponse<ITodo[]>> {
-    // Holen des JWT-Tokens aus dem AuthService
-    const jwtToken = this.tokenService.getToken();
 
-    // Setzen des JWT-Tokens im HTTP-Header
-    const headers = new HttpHeaders().set('Authorization', `Bearer ${jwtToken}`);
+  getWeeklyTasksByUserId(startDate: string, endDate: string): Observable<IResponse<ITodo[]>> {
+    let user = this.tokenService.getUser();
+    let userId = user?.id;
 
-    // Erstellen der URL mit den Query-Parametern
+    let headers = new HttpHeaders().set('Content-Type', 'application/json');
+
+    const token = this.tokenService.getToken();
+
     const url = `${apiEndpoint.TodoEndpoint.getWeeklyTasksByUserId}/${userId}?start=${startDate}&end=${endDate}`;
 
     return this.http.get<ITodo[]>(url, { headers: headers }).pipe(
@@ -45,19 +46,19 @@ export class TodoService {
     );
   }
 
-  addTodo(data: ITodo, authService: AuthService): Observable<IResponse<ITodo>> {
+  addTodo(data: ITodo): Observable<IResponse<ITodo>> {
     let headers = new HttpHeaders().set('Content-Type', 'application/json');
     const t = this.tokenService.getToken()
     // Überprüfen, ob authService.user vorhanden ist und ein Token enthält
-    if (authService.user?.user && t !== null) {
+    if (this.authService.user?.user && t !== null) {
       // Hinzufügen des JWT-Tokens zum Authorization-Header
       headers = headers.set('Authorization', `Bearer ${this.tokenService.getToken()}`);
-      console.log(authService.user);
-      data.users = [authService.user.user];
+      console.log(this.authService.user);
+      data.users = [this.authService.user.user];
     } else {
 
       if(t !== null) {
-        authService.getUserFromToken(t).subscribe(user => data.users = [this.responseUserToIUser(user)]);
+        this.authService.getUserFromToken(t).subscribe(user => data.users = [this.responseUserToIUser(user)]);
       }
     }
 
@@ -70,7 +71,7 @@ export class TodoService {
   }
   responseUserToIUser(lUser: ILoginResponse): IUser {
     return new class implements IUser {
-      userId: number = lUser.user.userId;
+      id: number = lUser.user.id;
       username: string = lUser.user.username;
     } ;
   }

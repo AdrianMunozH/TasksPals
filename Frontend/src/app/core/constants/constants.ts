@@ -1,5 +1,6 @@
 export const constants = {
   CURRENT_TOKEN: 'CURRENT_TOKEN',
+  CURRENT_USER: 'CURRENT_USER',
 };
 
 const apiurl = 'http://localhost:8000';
@@ -8,7 +9,7 @@ export const apiEndpoint = {
   AuthEndpoint: {
     login: `${apiurl}/auth/login`,
     logout: `${apiurl}/logout`,
-    loggedUser: `${apiurl}/user`,
+    loggedUser: `${apiurl}/api/v1/user`,
   },
   TodoEndpoint: {
     getAllTodo: `${apiurl}/api/v1/tasks`,

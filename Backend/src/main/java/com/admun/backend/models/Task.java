@@ -32,6 +32,9 @@ public class Task {
     @Column(name="task_date")
     private LocalDate taskDate;
 
+    @Column
+    private boolean completed;
+
 
     @ManyToMany
     @JoinTable(
@@ -44,14 +47,15 @@ public class Task {
     public Task() {
     }
 
-    public Task( String title, String description, TaskType taskType, LocalDate taskDate, Set<ApplicationUser> users) {
+    public Task(String title, String description, TaskType taskType, LocalDate taskDate, boolean completed, Set<ApplicationUser> users) {
         this.title = title;
         this.description = description;
         this.taskType = taskType;
         this.taskDate = taskDate;
+        this.completed = completed;
         this.users = users;
-        this.creationDate = LocalDate.now();
     }
+
 
     public Integer getId() {
         return id;
@@ -107,6 +111,15 @@ public class Task {
 
     public void setTaskType(TaskType taskType) {
         this.taskType = taskType;
+    }
+
+
+    public boolean isCompleted() {
+        return completed;
+    }
+
+    public void setCompleted(boolean completed) {
+        this.completed = completed;
     }
 
     @Override

@@ -16,6 +16,7 @@ export interface ITodo {
   creationDate: string;
   taskDate: string;
   users: IUser[];
+  completed: boolean;
 
   /*
   id?: number;

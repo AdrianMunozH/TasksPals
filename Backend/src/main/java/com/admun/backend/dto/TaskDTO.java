@@ -13,11 +13,12 @@ public class TaskDTO {
     private LocalDate creationDate;
     private LocalDate taskDate;
     private Set<UserDTO> userIds;
+    private boolean completed;
 
     public TaskDTO() {
     }
 
-    public TaskDTO(Integer id, String title, String description, TaskType taskType, LocalDate creationDate, LocalDate taskDate, Set<UserDTO> userIds) {
+    public TaskDTO(Integer id, String title, String description, TaskType taskType, LocalDate creationDate, LocalDate taskDate, Set<UserDTO> userIds, boolean completed) {
         this.id = id;
         this.title = title;
         this.description = description;
@@ -25,6 +26,7 @@ public class TaskDTO {
         this.creationDate = creationDate;
         this.taskDate = taskDate;
         this.userIds = userIds;
+        this.completed = completed;
     }
 
     public Set<UserDTO> getUserIds() {
@@ -85,5 +87,11 @@ public class TaskDTO {
         this.taskDate = taskDate;
     }
 
+    public boolean isCompleted() {
+        return completed;
+    }
 
+    public void setCompleted(boolean completed) {
+        this.completed = completed;
+    }
 }

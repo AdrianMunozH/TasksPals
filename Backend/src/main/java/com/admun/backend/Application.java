@@ -40,26 +40,26 @@ public class Application {
 			Set<Role> userRoles = new HashSet<>();
 			userRoles.add(userRole);
 
-			ApplicationUser admin = new ApplicationUser(1,"admin",passwordEncoder.encode("password"),adminRoles);
-			ApplicationUser user1 =  new ApplicationUser(2,"test.user@gmx.de",passwordEncoder.encode("password"), userRoles);
+			ApplicationUser admin = new ApplicationUser("admin",passwordEncoder.encode("password"),adminRoles);
+			ApplicationUser user1 =  new ApplicationUser("test.user@gmx.de",passwordEncoder.encode("password"), userRoles);
 			userRepository.save(admin);
 			userRepository.save(user1);
 
 			addTask("test task", "hier muss man gar nichts machen", TaskType.ONCE,
-					LocalDate.now().plusDays(3),new HashSet<>(Arrays.asList(1,2)),userRepository,taskRepository);
+					LocalDate.now().plusDays(3),new HashSet<>(Arrays.asList(1,2)),false,userRepository,taskRepository);
 			addTask("rep","wiederholend", TaskType.DAILY, LocalDate.now().plusDays(4),
-					new HashSet<>(List.of(2,3,4)),userRepository,taskRepository);
+					new HashSet<>(List.of(2,3,4)),false,userRepository,taskRepository);
 			addTask("kalareore", "wiederholend", TaskType.MONTHLY, LocalDate.now().plusDays(12),
-					new HashSet<>(List.of(3,4)),userRepository,taskRepository);
+					new HashSet<>(List.of(3,4)),false,userRepository,taskRepository);
 			addTask("laufen und so", "5km", TaskType.WEEKLY, LocalDate.now().plusDays(1),
-					new HashSet<>(List.of(5)),userRepository,taskRepository);
+					new HashSet<>(List.of(5)),false,userRepository,taskRepository);
 
 
 
 		};
 	}
 
-	private void addTask(String title, String description, TaskType taskType, LocalDate localDate, Set<Integer> ids, UserRepository userRepository, TaskRepository taskRepository) {
+	private void addTask(String title, String description, TaskType taskType, LocalDate localDate, Set<Integer> ids,boolean isCompleted, UserRepository userRepository, TaskRepository taskRepository) {
 		Set<ApplicationUser> users = new HashSet<>();
 
 		for (Integer id: ids) {
@@ -67,7 +67,7 @@ public class Application {
 			user.ifPresent(users::add);
 		}
 
-		Task task = new Task(title,description,taskType,localDate,users);
+		Task task = new Task(title,description,taskType,localDate,isCompleted,users);
 		taskRepository.save(task);
 	}
 

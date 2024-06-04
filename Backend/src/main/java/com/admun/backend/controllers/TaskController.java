@@ -114,7 +114,7 @@ public class TaskController {
         return ResponseEntity.ok().body(tasks);
     }
 
-    // /tasks/weekly/1?start=2024-05-23&end=2024-05-30
+    // api/v1/tasks/weekly/1?start=2024-05-23&end=2024-05-30
     @GetMapping("/tasks/weekly/{userId}")
     public ResponseEntity<List<TaskDTO>> getWeeklyTasksByUserId(
             @RequestParam("start") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,

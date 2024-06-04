@@ -14,6 +14,7 @@ import {
   Validators,
 } from '@angular/forms';
 import {AuthService} from "../../core/services/auth.service";
+import {TokenService} from "../../core/services/token.service";
 
 @Component({
   selector: 'app-todo',
@@ -23,13 +24,14 @@ import {AuthService} from "../../core/services/auth.service";
   styleUrl: './todo.component.scss',
 })
 export class TodoComponent implements OnInit {
+  date: Date = new Date();
   todoForm!: FormGroup;
   todos: ITodo[] = [];
   todoType = ITypeStatus;
   isSlidePanelOpen = false;
   todoId: number | null = null;
   filterByStatus = '';
-  constructor(private todoService: TodoService, private fb: FormBuilder, private authService: AuthService) {
+  constructor(private todoService: TodoService, private fb: FormBuilder, private authService: AuthService,private tokenService: TokenService) {
     this.todoForm = this.fb.group({
       title: new FormControl('', [Validators.required]),
       description: new FormControl('', [Validators.required]),
@@ -38,7 +40,10 @@ export class TodoComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.getAllTodos();
+    //this.getAllTodos();
+
+
+    this.getWeeklyTasksByUserId();
   }
 
   getAllTodos() {
@@ -48,18 +53,49 @@ export class TodoComponent implements OnInit {
       },
     });
   }
+
+
   getWeeklyTasksByUserId() {
-    if(this.authService.user?.user) {
-      this.todoService.getWeeklyTasksByUserId(this.authService.user?.user.userId,"start=2024-05-23","2024-05-30").subscribe({
-        next: (response) => {
-          this.todos = response.data;
-        }
-      })
-    } else {
-      
+
+    let mondaySunday = this.getMondayAndSunday(this.date),monday =mondaySunday[0],sunday=mondaySunday[1];
+    this.todoService.getWeeklyTasksByUserId(monday.toISOString().split('T')[0], sunday.toISOString().split('T')[0]).subscribe({
+      next: (response) => {
+        this.todos = response.data;
+      }
+    })
+  }
+
+  getMondayAndSunday(date: Date): Date[] {
+    var day = date.getDay(),
+      diff = date.getDate() - day + (day == 0 ? -6 : 1);
+    return [new Date(date.setDate(diff)),new Date(date.setDate(diff + 6))];
+  }
+
+  setDate(diff: number) {
+    const today = new Date();
+    this.date = new Date(today.setDate(today.getDate() + diff));
+  }
+
+  getDateTitle(): String {
+    const today = new Date();
+    const MS_PER_DAY = 1000 * 60 * 60 * 24;
+
+    const diffInDays = Math.round((this.date.getTime() - today.getTime()) / MS_PER_DAY);
+
+
+    if (diffInDays >= -7 && diffInDays <= 7) {
+      return "This Week";
+    } else if (diffInDays > 7 && diffInDays <= 14) {
+      return "Next Week";
+    } else if (diffInDays < -7 && diffInDays >= -14) {
+      return "Last Week";
     }
 
+    // For other cases, get the date range for the week
+    const [monday, sunday] = this.getMondayAndSunday(this.date);
+    return `${monday.toLocaleDateString()} - ${sunday.toLocaleDateString()}`;
   }
+
 
   openSlidePanel() {
     this.isSlidePanelOpen = true;
@@ -86,7 +122,7 @@ export class TodoComponent implements OnInit {
             },
           });
       } else {
-        this.todoService.addTodo(this.todoForm.value, this.authService).subscribe({
+        this.todoService.addTodo(this.todoForm.value).subscribe({
           next: (response) => {
             this.getAllTodos();
             this.onCloseSlidePanel();

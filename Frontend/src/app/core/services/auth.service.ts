@@ -14,16 +14,15 @@ export class AuthService {
 
   constructor(private http: HttpClient, private tokenService: TokenService) {}
 
-  onLogin(data: ILogin) {
+  onLogin(data: ILogin): Observable<ILoginResponse> {
     return this.http
       .post<ILoginResponse>(`${apiEndpoint.AuthEndpoint.login}`, data)
       .pipe(
         map((response) => {
           if (response) {
             console.log(response)
-            this.tokenService.setToken(response.jwt);
+            this.tokenService.setToken(response.jwt,response.user);
             this.user = response;
-            console.log(this.user);
           }
           return response;
         })
@@ -41,15 +40,8 @@ export class AuthService {
   // TODO
   getUserFromToken(jwt: string): Observable<ILoginResponse> {
     const headers = new HttpHeaders().set('Authorization', `Bearer ${jwt}`);
-    return this.http.get<any>('https://example.com/api/v1/user', { headers: headers });
+    return this.http.get<any>(`${apiEndpoint.AuthEndpoint.loggedUser}`, { headers: headers });
   }
 
-//  refreshUser(): Observable<ILoginResponse>{
-//    const token = this.tokenService.getToken();
-//    const response;
-//    if (token !== null) {
-//       response = this.getUserFromToken(token).subscribe(user => this.user = user);
-//    }
-//    return response;
-//  }
+
 }

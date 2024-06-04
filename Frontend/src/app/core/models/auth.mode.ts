@@ -1,5 +1,5 @@
 export interface IUser {
-  userId: number;
+  id: number;
   username: string;
 }
 export interface ILogin {
