@@ -15,11 +15,14 @@ import {
 } from '@angular/forms';
 import {AuthService} from "../../core/services/auth.service";
 import {TokenService} from "../../core/services/token.service";
+import {MatIcon} from "@angular/material/icon";
+import {MatIconButton} from "@angular/material/button";
+import {addWeeks, addDays, lastDayOfMonth, setMonth, setDay, getDaysInMonth, setDate} from "date-fns";
 
 @Component({
   selector: 'app-todo',
   standalone: true,
-  imports: [TodoCardComponent, SlidePanelComponent, ReactiveFormsModule],
+  imports: [TodoCardComponent, SlidePanelComponent, ReactiveFormsModule, MatIcon, MatIconButton],
   templateUrl: './todo.component.html',
   styleUrl: './todo.component.scss',
 })
@@ -40,9 +43,6 @@ export class TodoComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    //this.getAllTodos();
-
-
     this.getWeeklyTasksByUserId();
   }
 
@@ -56,8 +56,8 @@ export class TodoComponent implements OnInit {
 
 
   getWeeklyTasksByUserId() {
-
-    let mondaySunday = this.getMondayAndSunday(this.date),monday =mondaySunday[0],sunday=mondaySunday[1];
+    const currentDate = new Date(this.date);
+    let mondaySunday = this.getMondayAndSunday(currentDate),monday =mondaySunday[0],sunday=mondaySunday[1];
     this.todoService.getWeeklyTasksByUserId(monday.toISOString().split('T')[0], sunday.toISOString().split('T')[0]).subscribe({
       next: (response) => {
         this.todos = response.data;
@@ -66,15 +66,51 @@ export class TodoComponent implements OnInit {
   }
 
   getMondayAndSunday(date: Date): Date[] {
-    var day = date.getDay(),
+    let day = date.getDay(),
       diff = date.getDate() - day + (day == 0 ? -6 : 1);
     return [new Date(date.setDate(diff)),new Date(date.setDate(diff + 6))];
   }
 
-  setDate(diff: number) {
-    const today = new Date();
-    this.date = new Date(today.setDate(today.getDate() + diff));
+
+/*
+
+  addDays(diffInDays: number) {
+
+    if(this.date.getDate() + diffInDays > lastDayOfMonth(this.date).getDate()) {
+      this.date = setMonth(this.date,this.date.getMonth()+1);
+      this.date = setDay(this.date,this.date.getDay()+ diffInDays % lastDayOfMonth(this.date).getDay());
+    } else {
+
+      this.date = addDays(this.date,diffInDays);
+    }
   }
+*/
+  addDays(diffInDays: number) {
+
+    console.log(this.date + " Datum b4");
+    console.log(this.date.getDate() + diffInDays + " " + getDaysInMonth(this.date));
+    if(this.date.getDate() + diffInDays >= getDaysInMonth(this.date)) {
+      const month = setMonth(this.date,this.date.getMonth()+1).getMonth() +1;
+      const day = setDay(this.date,(this.date.getDay()+ diffInDays) % getDaysInMonth(this.date)).getDay()+1;
+      console.log(month + " " + day);
+      console.log("b4 set - " + this.date)
+      this.date.setMonth(month,day);
+      console.log("if")
+    } else {
+      console.log("else")
+      this.date = addDays(this.date,diffInDays);
+    }
+    console.log(this.date + " Datum after");
+    this.getWeeklyTasksByUserId()
+  }
+
+  /*
+  setDate(diffInDays: number) {
+    const newDate = new Date(this.date.getTime() + diffInDays * 24 * 60 * 60 * 1000); // 24 hours * 60 minutes * 60 seconds * 1000 milliseconds
+    this.date = newDate;
+    this.getWeeklyTasksByUserId();
+  }
+  */
 
   getDateTitle(): String {
     const today = new Date();
@@ -117,14 +153,14 @@ export class TodoComponent implements OnInit {
           .updateTodo(this.todoId, this.todoForm.value,this.authService)
           .subscribe({
             next: (response) => {
-              this.getAllTodos();
+              this.getWeeklyTasksByUserId();
               this.onCloseSlidePanel();
             },
           });
       } else {
         this.todoService.addTodo(this.todoForm.value).subscribe({
           next: (response) => {
-            this.getAllTodos();
+            this.getWeeklyTasksByUserId();
             this.onCloseSlidePanel();
           },
         });

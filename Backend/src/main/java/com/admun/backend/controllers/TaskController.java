@@ -122,6 +122,4 @@ public class TaskController {
         List<TaskDTO> weeklyTasks = taskService.getTasksWithinRange(userId,startDate,endDate);
         return ResponseEntity.ok().body(weeklyTasks);
     }
-
-
 }

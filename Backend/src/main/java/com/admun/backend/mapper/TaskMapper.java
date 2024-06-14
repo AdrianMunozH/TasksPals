@@ -23,7 +23,8 @@ public class TaskMapper {
                 task.getTaskType(),
                 task.getCreationDate(),
                 task.getTaskDate(),
-                userDTOs
+                userDTOs,
+                task.isCompleted()
         );
     }
     public static UserDTO toUserDTO(ApplicationUser user) {

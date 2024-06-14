@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { map, Observable} from 'rxjs';
+import {catchError, from, map, Observable, of, switchMap} from 'rxjs';
 import { IResponse, ITodo } from '../models/todo.model';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { apiEndpoint } from '../constants/constants';
@@ -12,6 +12,7 @@ import {ILoginResponse, IUser} from "../models/auth.mode";
 })
 export class TodoService {
   constructor(private http: HttpClient, private tokenService: TokenService, private authService: AuthService) {}
+
 
   getAllTodo(status: string): Observable<IResponse<ITodo[]>> {
     let queryString = '';
@@ -33,7 +34,8 @@ export class TodoService {
 
   getWeeklyTasksByUserId(startDate: string, endDate: string): Observable<IResponse<ITodo[]>> {
     let user = this.tokenService.getUser();
-    let userId = user?.id;
+    let userId;
+    user.subscribe(data => {userId = data?.id});
 
     let headers = new HttpHeaders().set('Content-Type', 'application/json');
 
@@ -46,29 +48,41 @@ export class TodoService {
     );
   }
 
+
   addTodo(data: ITodo): Observable<IResponse<ITodo>> {
     let headers = new HttpHeaders().set('Content-Type', 'application/json');
-    const t = this.tokenService.getToken()
-    // Überprüfen, ob authService.user vorhanden ist und ein Token enthält
-    if (this.authService.user?.user && t !== null) {
-      // Hinzufügen des JWT-Tokens zum Authorization-Header
-      headers = headers.set('Authorization', `Bearer ${this.tokenService.getToken()}`);
-      console.log(this.authService.user);
-      data.users = [this.authService.user.user];
-    } else {
+    const token = this.tokenService.getToken();
 
-      if(t !== null) {
-        this.authService.getUserFromToken(t).subscribe(user => data.users = [this.responseUserToIUser(user)]);
-      }
-    }
+    return from(this.tokenService.getUser()).pipe(
+      switchMap(user => {
+        if (user) {
+          headers = headers.set('Authorization', `Bearer ${token}`);
+          data.users = [user];
+          console.log(this.authService.user);
+          console.log(user);
 
-    // POST-Anfrage mit den Daten und dem aktualisierten Header senden
-    return this.http.post<IResponse<ITodo>>(
-      `${apiEndpoint.TodoEndpoint.addTodo}`,
-      data,
-      { headers: headers }
+          return this.http.post<IResponse<ITodo>>(
+            `${apiEndpoint.TodoEndpoint.addTodo}`,
+            data,
+            { headers: headers }
+          );
+        } else {
+          return of({
+            message: 'User not found or not authenticated',
+            data: null
+          } as unknown as IResponse<ITodo>);
+        }
+      }),
+      catchError(error => {
+        console.error(error);
+        return of({
+          message: 'An error occurred',
+          data: null
+        } as unknown as IResponse<ITodo>);
+      })
     );
   }
+
   responseUserToIUser(lUser: ILoginResponse): IUser {
     return new class implements IUser {
       id: number = lUser.user.id;
