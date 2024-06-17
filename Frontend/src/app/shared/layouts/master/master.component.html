@@ -1,6 +1,19 @@
+<!--
 <app-header></app-header>
 <main class="app-wrapper">
   <div class="container py-6">
     <router-outlet></router-outlet>
   </div>
 </main>
+-->
+
+
+
+<mat-drawer-container class="app-container h-screen">
+  <mat-drawer class=" bg-accent-light" mode="side" opened>
+    <app-header></app-header>
+  </mat-drawer>
+  <mat-drawer-content class="h-full flex flex-col bg-white text-black py-6">
+    <router-outlet></router-outlet>
+  </mat-drawer-content>
+</mat-drawer-container>

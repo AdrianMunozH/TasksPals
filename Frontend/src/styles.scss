@@ -34,7 +34,7 @@ body {
   }
 
   .btn-primary {
-    @apply text-white bg-blue-600 hover:bg-blue-700;
+    @apply text-white bg-accent-dark hover:bg-accent-light;
   }
   .btn-success {
     @apply text-white bg-green-600 hover:bg-green-700;

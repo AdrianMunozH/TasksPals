@@ -1,4 +1,6 @@
 /** @type {import('tailwindcss').Config} */
+const colors = require('tailwindcss/colors');
+
 module.exports = {
   content: ["./src/**/*.{html,ts}"],
   theme: {
@@ -12,7 +14,25 @@ module.exports = {
         "2xl": "6rem",
       },
     },
-    extend: {},
+    extend: {
+      colors: {
+        primary: {
+          DEFAULT: '#457b9d', // Primary color from Angular Material theme
+          light: '#AAC1C0',  // Light variant of the primary color
+          dark: '#1d3557',   // Dark variant of the primary color
+        },
+        accent: {
+          DEFAULT: '#726794', // Accent color from Angular Material theme
+          light: '#726794',  // Light variant of the accent color
+          dark: '#392E60',   // Dark variant of the accent color
+        },
+        warn: {
+          DEFAULT: '#e63946', // Warn color from Angular Material theme
+          light: '#ff7961',  // Light variant of the warn color
+          dark: '#ba000d',   // Dark variant of the warn color
+        }
+      },
+    },
   },
   plugins: [],
 };
