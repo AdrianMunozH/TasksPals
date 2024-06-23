@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import {ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import {
   ITypeStatus,
   TodoCardComponent,
@@ -18,11 +18,17 @@ import {TokenService} from "../../core/services/token.service";
 import {MatIcon} from "@angular/material/icon";
 import {MatIconButton} from "@angular/material/button";
 import {addWeeks, addDays, lastDayOfMonth, setMonth, setDay, getDaysInMonth, setDate} from "date-fns";
+import {MatDatepickerInputEvent, MatDatepickerModule} from '@angular/material/datepicker';
+import {MatFormFieldModule} from '@angular/material/form-field';
+import { provideNativeDateAdapter } from '@angular/material/core';
+import {MatInputModule} from "@angular/material/input";
 
 @Component({
   selector: 'app-todo',
   standalone: true,
-  imports: [TodoCardComponent, SlidePanelComponent, ReactiveFormsModule, MatIcon, MatIconButton],
+  imports: [TodoCardComponent, SlidePanelComponent, ReactiveFormsModule, MatIcon, MatIconButton,MatFormFieldModule, MatInputModule, MatDatepickerModule],
+  providers: [provideNativeDateAdapter()],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './todo.component.html',
   styleUrl: './todo.component.scss',
 })
@@ -34,16 +40,21 @@ export class TodoComponent implements OnInit {
   isSlidePanelOpen = false;
   todoId: number | null = null;
   filterByStatus = '';
+  events: string[] = [];
   constructor(private todoService: TodoService, private fb: FormBuilder, private authService: AuthService,private tokenService: TokenService) {
     this.todoForm = this.fb.group({
       title: new FormControl('', [Validators.required]),
       description: new FormControl('', [Validators.required]),
       taskType: new FormControl('ONCE', [Validators.required]),
+      taskDate: new FormControl('', [Validators.required])
     });
   }
 
   ngOnInit(): void {
     this.getWeeklyTasksByUserId();
+    if(this.date !== null)  {
+      this.date = new Date();
+    }
   }
 
   getAllTodos() {
@@ -54,10 +65,14 @@ export class TodoComponent implements OnInit {
     });
   }
 
+  addEvent(type: string, event: MatDatepickerInputEvent<Date>) {
+    console.log(`${type}: ${event.value}`);
+    this.events.push(`${type}: ${event.value}`);
+  }
 
   getWeeklyTasksByUserId() {
     const currentDate = new Date(this.date);
-    let mondaySunday = this.getMondayAndSunday(currentDate),monday =mondaySunday[0],sunday=mondaySunday[1];
+    let mondaySunday = this.getMondayAndSunday(currentDate),monday = mondaySunday[0],sunday = mondaySunday[1];
     this.todoService.getWeeklyTasksByUserId(monday.toISOString().split('T')[0], sunday.toISOString().split('T')[0]).subscribe({
       next: (response) => {
         this.todos = response.data;
@@ -65,71 +80,61 @@ export class TodoComponent implements OnInit {
     })
   }
 
-  getMondayAndSunday(date: Date): Date[] {
-    let day = date.getDay(),
-      diff = date.getDate() - day + (day == 0 ? -6 : 1);
-    return [new Date(date.setDate(diff)),new Date(date.setDate(diff + 6))];
+  getMondayAndSunday(someDay: Date): Date[] {
+    let tempdate = new Date(someDay);
+    let day = tempdate.getDay(),
+      diff = tempdate.getDate() - day + (day == 0 ? -6 : 1);
+    return [new Date(tempdate.setDate(diff)),new Date(tempdate.setDate(diff + 6))]
+
   }
-
-
-/*
 
   addDays(diffInDays: number) {
 
-    if(this.date.getDate() + diffInDays > lastDayOfMonth(this.date).getDate()) {
-      this.date = setMonth(this.date,this.date.getMonth()+1);
-      this.date = setDay(this.date,this.date.getDay()+ diffInDays % lastDayOfMonth(this.date).getDay());
+    const currentDate = new Date(this.date); // Kopie von this.date erstellen
+
+    if (currentDate.getDate() + diffInDays > lastDayOfMonth(currentDate).getDate()) {
+
+      currentDate.setDate(lastDayOfMonth(currentDate).getDate());
+
+      const daysOver = (currentDate.getDate() + diffInDays) - lastDayOfMonth(currentDate).getDate();
+
+      currentDate.setDate(1);
+      currentDate.setMonth(currentDate.getMonth() + 1);
+      currentDate.setDate(currentDate.getDate() + daysOver);
+
     } else {
 
-      this.date = addDays(this.date,diffInDays);
+      currentDate.setDate(currentDate.getDate() + diffInDays);
     }
-  }
-*/
-  addDays(diffInDays: number) {
 
-    console.log(this.date + " Datum b4");
-    console.log(this.date.getDate() + diffInDays + " " + getDaysInMonth(this.date));
-    if(this.date.getDate() + diffInDays >= getDaysInMonth(this.date)) {
-      const month = setMonth(this.date,this.date.getMonth()+1).getMonth() +1;
-      const day = setDay(this.date,(this.date.getDay()+ diffInDays) % getDaysInMonth(this.date)).getDay()+1;
-      console.log(month + " " + day);
-      console.log("b4 set - " + this.date)
-      this.date.setMonth(month,day);
-      console.log("if")
-    } else {
-      console.log("else")
-      this.date = addDays(this.date,diffInDays);
-    }
-    console.log(this.date + " Datum after");
-    this.getWeeklyTasksByUserId()
-  }
+    this.date = currentDate;
 
-  /*
-  setDate(diffInDays: number) {
-    const newDate = new Date(this.date.getTime() + diffInDays * 24 * 60 * 60 * 1000); // 24 hours * 60 minutes * 60 seconds * 1000 milliseconds
-    this.date = newDate;
     this.getWeeklyTasksByUserId();
   }
-  */
+
+
 
   getDateTitle(): String {
     const today = new Date();
+    today.setHours(0, 0, 0, 0);  // Setze die Uhrzeit auf den Anfang des Tages weil es sonst zu Fehlverhalten führen kann
     const MS_PER_DAY = 1000 * 60 * 60 * 24;
+    const diffInTime = this.date.getTime() - today.getTime();
+    const diffInDays = Math.floor(diffInTime / MS_PER_DAY);
 
-    const diffInDays = Math.round((this.date.getTime() - today.getTime()) / MS_PER_DAY);
 
-
-    if (diffInDays >= -7 && diffInDays <= 7) {
+    if (diffInDays >= -6 && diffInDays <= 6) {
       return "This Week";
-    } else if (diffInDays > 7 && diffInDays <= 14) {
+    } else if (diffInDays > 6 && diffInDays <= 13) {
       return "Next Week";
-    } else if (diffInDays < -7 && diffInDays >= -14) {
+    } else if (diffInDays < -6 && diffInDays >= -14) {
       return "Last Week";
     }
 
-    // For other cases, get the date range for the week
+
+    // Show Range of Days
     const [monday, sunday] = this.getMondayAndSunday(this.date);
-    return `${monday.toLocaleDateString()} - ${sunday.toLocaleDateString()}`;
+    const options: Intl.DateTimeFormatOptions = { day: '2-digit', month: '2-digit', year: '2-digit' };
+    return `${monday.toLocaleDateString('en-GB', options)} - ${sunday.toLocaleDateString('en-GB', options)}`;
   }
 
 
@@ -176,6 +181,7 @@ export class TodoComponent implements OnInit {
       title: item.title,
       description: item.description,
       taskType: item.taskType,
+      taskDate: item.date
     });
     this.openSlidePanel();
   }

@@ -19,7 +19,7 @@ module.exports = {
         primary: {
           DEFAULT: '#457b9d', // Primary color from Angular Material theme
           light: '#AAC1C0',  // Light variant of the primary color
-          dark: '#1d3557',   // Dark variant of the primary color
+          dark: '#735925',   // Dark variant of the primary color
         },
         accent: {
           DEFAULT: '#726794', // Accent color from Angular Material theme
