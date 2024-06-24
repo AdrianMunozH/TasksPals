@@ -19,6 +19,7 @@ import {MatIcon} from "@angular/material/icon";
 import {MatIconButton} from "@angular/material/button";
 import {addWeeks, addDays, lastDayOfMonth, setMonth, setDay, getDaysInMonth, setDate} from "date-fns";
 import {MatDatepickerInputEvent, MatDatepickerModule} from '@angular/material/datepicker';
+import {MatDividerModule} from '@angular/material/divider';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import { provideNativeDateAdapter } from '@angular/material/core';
 import {MatInputModule} from "@angular/material/input";
@@ -26,7 +27,8 @@ import {MatInputModule} from "@angular/material/input";
 @Component({
   selector: 'app-todo',
   standalone: true,
-  imports: [TodoCardComponent, SlidePanelComponent, ReactiveFormsModule, MatIcon, MatIconButton,MatFormFieldModule, MatInputModule, MatDatepickerModule],
+  imports: [TodoCardComponent, SlidePanelComponent, ReactiveFormsModule, MatIcon, MatIconButton,MatFormFieldModule,
+    MatInputModule, MatDatepickerModule,MatDividerModule],
   providers: [provideNativeDateAdapter()],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './todo.component.html',
@@ -56,7 +58,11 @@ export class TodoComponent implements OnInit {
       this.date = new Date();
     }
   }
-
+  getDayByString(date: string): string {
+    const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const d = new Date(date);
+    return days[d.getDay()];
+  }
   getAllTodos() {
     this.todoService.getAllTodo(this.filterByStatus).subscribe({
       next: (response) => {
@@ -75,11 +81,24 @@ export class TodoComponent implements OnInit {
     let mondaySunday = this.getMondayAndSunday(currentDate),monday = mondaySunday[0],sunday = mondaySunday[1];
     this.todoService.getWeeklyTasksByUserId(monday.toISOString().split('T')[0], sunday.toISOString().split('T')[0]).subscribe({
       next: (response) => {
-        this.todos = response.data;
+        this.todos = this.sortByDay(response.data);
       }
     })
   }
 
+  sortByDay(tasks: ITodo[]) {
+    return tasks.sort((a,b) => {
+      const aDate = new Date(a.taskDate);
+      const bDate = new Date(b.taskDate);
+      return aDate.getTime() - bDate.getTime();
+    });
+  }
+  isSameDay(date: String, idx: number): boolean {
+    if(idx >= 1)
+      return date === this.todos[idx-1].taskDate;
+    else
+      return false;
+  }
   getMondayAndSunday(someDay: Date): Date[] {
     let tempdate = new Date(someDay);
     let day = tempdate.getDay(),

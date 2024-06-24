@@ -1,13 +1,13 @@
 <div class="flex flex-col">
-  <div class="flex justify-between items-center">
+  <div class="flex justify-between items-center mx-4">
     <button mat-icon-button aria-label="Last Week" (click)="addDays(-7)">
       <span class="material-icons">chevron_left</span>
     </button>
-    <h2 class="font-bold text-xl">{{ getDateTitle() }}</h2>
+    <h1 class="font-bold text-xl">{{ getDateTitle() }}</h1>
     <button mat-icon-button aria-label="Next Week" (click)="addDays(7)">
       <span class="material-icons">navigate_next</span>
     </button>
-    <button class="btn btn-icon btn-rounded btn-primary" (click)="openSlidePanel()">
+    <button class="btn btn-icon btn-rounded btn-primary mx-8" (click)="openSlidePanel()">
       <i class="ri-add-line ri-lg"></i>
       Add Todo
     </button>
@@ -17,7 +17,13 @@
   </div>
 
   <div class="mt-3 bg-white shadow">
-    @for (item of todos; track $index) {
+    @for (item of todos; track item.completed; let idx = $index) {
+    @if (!isSameDay(item.taskDate,idx)) {
+    <div class="flex flex-col bg-primary-dark rounded-full mx-4 my-2">
+      <a class="mx-4 text-xl text-white">{{ getDayByString(item.taskDate) }}</a>
+      <mat-divider class="my-4"></mat-divider>
+    </div>
+    }
     <app-todo-card [todoType]="item.taskType" [todo]="item" (click)="onLoadTodoForm(item)"></app-todo-card>
     }
   </div>
@@ -66,9 +72,10 @@
         <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
         <mat-datepicker #picker></mat-datepicker>
       </mat-form-field>
-      <span *ngIf="todoForm.get('taskDate').hasError('required') && todoForm.get('taskDate').touched" class="form-error">
-        Date is required.
-      </span>
+      @if (todoForm.get('taskDate')?.hasError('required') && todoForm.get('taskDate')?.touched) {
+      <span class="form-error">Date is required.</span>
+      }
+
     </div>
     <div class="flex gap-2">
       <button type="submit" class="btn btn-success">Submit</button>
