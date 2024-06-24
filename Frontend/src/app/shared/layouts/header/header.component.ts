@@ -3,13 +3,17 @@ import { TokenService } from '../../../core/services/token.service';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../../core/services/auth.service';
 import { MatSidenavModule } from '@angular/material/sidenav';
+import {MatIcon} from "@angular/material/icon";
+import {MatIconButton} from "@angular/material/button";
 
 @Component({
   selector: 'app-header',
   standalone: true,
   imports: [
     CommonModule,
-    MatSidenavModule
+    MatSidenavModule,
+    MatIcon,
+    MatIconButton
   ],
   templateUrl: './header.component.html',
   styleUrl: './header.component.scss',

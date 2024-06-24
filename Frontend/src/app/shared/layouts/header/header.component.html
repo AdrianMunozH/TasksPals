@@ -2,15 +2,16 @@
   <div class="container flex flex-col items-center max-w-28 justify-center my-8">
     <div class="mb-4 flex flex-col items-center">
       <img src="../../../../assets/CustomIcons/Home-Icon-Rounded.svg" alt="HomeIcon" class="max-w-28 max-h-28 mb-2">
-      <h4 class="font-bold text-xl ">TasksPals</h4>
+      <p class="font-bold text-xl text-secondary-light">TasksPals</p>
     </div>
   </div>
   <div class="flex flex-col gap-3 mt-auto mb-8">
     <div class="px-2 font-medium cursor-pointer" *ngIf="isAuthenticated$ | async" (click)="onLogout()">
-      <div class="flex flex-col justify-center"><button mat-icon-button>
-          <span class="material-icons">logout</span>
+      <div class="flex flex-col justify-center">
+        <button class="flex flex-row rounded-md bg-secondary h-12 w-24 items-center justify-center" >
+          Logout<mat-icon class="ml-2 material-icons text-accent-dark">logout</mat-icon>
         </button>
-        <p>Logout</p></div>
+      </div>
 
     </div>
     <div class="px-2 font-medium cursor-pointer" *ngIf="!(isAuthenticated$ | async)">Login</div>

@@ -7,7 +7,7 @@
     <button mat-icon-button aria-label="Next Week" (click)="addDays(7)">
       <span class="material-icons">navigate_next</span>
     </button>
-    <button class="btn btn-icon btn-rounded btn-primary mx-8" (click)="openSlidePanel()">
+    <button class="btn btn-icon btn-rounded-md btn-primary mx-8" (click)="openSlidePanel()">
       <i class="ri-add-line ri-lg"></i>
       Add Todo
     </button>
@@ -20,11 +20,21 @@
     @for (item of todos; track item.completed; let idx = $index) {
     @if (!isSameDay(item.taskDate,idx)) {
     <div class="flex flex-col bg-primary-dark rounded-full mx-4 my-2">
-      <a class="mx-4 text-xl text-white">{{ getDayByString(item.taskDate) }}</a>
-      <mat-divider class="my-4"></mat-divider>
+      <div class="mx-4 text-xl text-white">{{ getDayByString(item.taskDate) }}</div>
     </div>
     }
-    <app-todo-card [todoType]="item.taskType" [todo]="item" (click)="onLoadTodoForm(item)"></app-todo-card>
+    <div class="flex flex-row relative group w-full cursor-pointer hover:bg-gray-100 relative border-b border-gray-200">
+      <div class="w-80">
+        <app-todo-card [todoType]="item.taskType" [todo]="item"></app-todo-card>
+      </div>
+      <div class="w-20 flex flex-row justify-center items-end absolute right-0 mt-8 mr-8">
+        <mat-checkbox [checked]="item.completed" (change)="updateIsCompleted($event.checked, idx)" class="scale-2 ml-2 mr-4 self-center opacity-0 group-hover:opacity-100 transition-opacity duration-300"></mat-checkbox>
+        <button mat-fab class="p-2 bg-gray-800 text-white rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-300" (click)="onLoadTodoForm(item)">
+          <mat-icon size=40>mode_edit</mat-icon>
+        </button>
+      </div>
+    </div>
+
     }
   </div>
 </div>

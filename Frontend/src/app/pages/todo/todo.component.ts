@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import {
   ITypeStatus,
   TodoCardComponent,
@@ -10,6 +10,7 @@ import {
   FormBuilder,
   FormControl,
   FormGroup,
+  FormsModule,
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
@@ -23,12 +24,13 @@ import {MatDividerModule} from '@angular/material/divider';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import { provideNativeDateAdapter } from '@angular/material/core';
 import {MatInputModule} from "@angular/material/input";
+import { MatCheckboxModule } from '@angular/material/checkbox';
 
 @Component({
   selector: 'app-todo',
   standalone: true,
   imports: [TodoCardComponent, SlidePanelComponent, ReactiveFormsModule, MatIcon, MatIconButton,MatFormFieldModule,
-    MatInputModule, MatDatepickerModule,MatDividerModule],
+    MatInputModule, MatDatepickerModule,MatDividerModule,MatCheckboxModule,FormsModule],
   providers: [provideNativeDateAdapter()],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './todo.component.html',
@@ -43,7 +45,7 @@ export class TodoComponent implements OnInit {
   todoId: number | null = null;
   filterByStatus = '';
   events: string[] = [];
-  constructor(private todoService: TodoService, private fb: FormBuilder, private authService: AuthService,private tokenService: TokenService) {
+  constructor(private todoService: TodoService, private fb: FormBuilder, private authService: AuthService,private tokenService: TokenService,private cdRef: ChangeDetectorRef) {
     this.todoForm = this.fb.group({
       title: new FormControl('', [Validators.required]),
       description: new FormControl('', [Validators.required]),
@@ -54,9 +56,6 @@ export class TodoComponent implements OnInit {
 
   ngOnInit(): void {
     this.getWeeklyTasksByUserId();
-    if(this.date !== null)  {
-      this.date = new Date();
-    }
   }
   getDayByString(date: string): string {
     const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -82,8 +81,18 @@ export class TodoComponent implements OnInit {
     this.todoService.getWeeklyTasksByUserId(monday.toISOString().split('T')[0], sunday.toISOString().split('T')[0]).subscribe({
       next: (response) => {
         this.todos = this.sortByDay(response.data);
+        this.cdRef.detectChanges();
+        console.log(this.todos);
       }
     })
+  }
+
+  updateIsCompleted(completed: boolean, index: number) {
+    if(index >= 0 && this.todos.length >= 0) {
+
+      this.todos[index].completed = completed;
+    }
+
   }
 
   sortByDay(tasks: ITodo[]) {

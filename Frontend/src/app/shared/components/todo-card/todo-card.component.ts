@@ -8,7 +8,7 @@ export const ITypeStatus = ['ONCE', 'DAILY', 'WEEKLY', 'MONTHLY', 'YEARLY'];
 @Component({
   selector: 'app-todo-card',
   standalone: true,
-  imports: [MatCheckboxModule,FormsModule],
+  imports: [],
   templateUrl: './todo-card.component.html',
   styleUrl: './todo-card.component.scss',
 })

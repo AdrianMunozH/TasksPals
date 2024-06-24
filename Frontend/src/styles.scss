@@ -1,8 +1,11 @@
+@use '@angular/material' as mat;
+
 @import url(https://fonts.googleapis.com/css?family=Roboto:100,100italic,300,300italic,regular,italic,500,500italic,700,700italic,900,900italic);
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
 
 @import "./assets/scss/common";
 
@@ -73,7 +76,103 @@ body {
   .form-select {
     @apply w-full py-2 px-3 outline-none border-2 border-gray-200 rounded-lg;
   }
-}
+};
 
 html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; };
+
+$custom-primary-palette: (
+  50: #AAC1C0,
+  100: #6D8A89,
+  500: #8c7039,
+  700: #735925,
+  contrast: (
+    50: #000,
+    100: #000,
+    200: #000,
+    300: #fff,
+    400: #fff,
+    500: #fff,
+    600: #fff,
+    700: #fff,
+    800: #fff,
+    900: #fff,
+  )
+);
+
+$custom-secondary-palette: (
+  50: #FFE0B2,
+  100: #FFB74D,
+  500: #AAC1C0,
+  700: #556060,
+  contrast: (
+    50: #000,
+    100: #000,
+    200: #000,
+    300: #fff,
+    400: #fff,
+    500: #fff,
+    600: #fff,
+    700: #fff,
+    800: #fff,
+    900: #fff,
+  )
+);
+
+$custom-accent-palette: (
+  50: #726794,
+  100: #39496B,
+  500: #726794,
+  700: #392E60,
+  contrast: (
+    50: #000,
+    100: #000,
+    200: #000,
+    300: #fff,
+    400: #fff,
+    500: #fff,
+    600: #fff,
+    700: #fff,
+    800: #fff,
+    900: #fff,
+  )
+);
+
+$custom-warn-palette: (
+  50: #FF7961,
+  100: #FF5131,
+  500: #ff7961,
+  700: #ba000d,
+  contrast: (
+    50: #000,
+    100: #000,
+    200: #000,
+    300: #fff,
+    400: #fff,
+    500: #fff,
+    600: #fff,
+    700: #fff,
+    800: #fff,
+    900: #fff,
+  )
+);
+
+
+
+$custom-primary: mat.define-palette($custom-primary-palette);
+$custom-secondary: mat.define-palette($custom-secondary-palette);
+$custom-accent: mat.define-palette($custom-accent-palette);
+$custom-warn: mat.define-palette($custom-warn-palette);
+
+$custom-theme: mat.define-light-theme(
+    (
+      color: (
+        primary: $custom-primary,
+        secondary: $custom-secondary,
+        accent: $custom-accent,
+        warn: $custom-warn
+      )
+    )
+);
+
+@include mat.all-component-themes($custom-theme);

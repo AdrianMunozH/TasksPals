@@ -17,9 +17,14 @@ module.exports = {
     extend: {
       colors: {
         primary: {
-          DEFAULT: '#457b9d', // Primary color from Angular Material theme
-          light: '#AAC1C0',  // Light variant of the primary color
+          DEFAULT: '#8c7039', // Primary color from Angular Material theme
+          light: '#8c7039',  // Light variant of the primary color
           dark: '#735925',   // Dark variant of the primary color
+        },
+        secondary: {
+          DEFAULT: '#AAC1C0',
+          light: '#AAC1C0',
+          dark: '#556060'
         },
         accent: {
           DEFAULT: '#726794', // Accent color from Angular Material theme
