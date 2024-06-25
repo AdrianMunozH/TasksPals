@@ -82,10 +82,10 @@ html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; };
 
 $custom-primary-palette: (
-  50: #AAC1C0,
-  100: #6D8A89,
-  500: #8c7039,
-  700: #735925,
+  50: #686D76,
+  100: #686D76,
+  500: #686D76,
+  700: #373A40,
   contrast: (
     50: #000,
     100: #000,
@@ -101,10 +101,10 @@ $custom-primary-palette: (
 );
 
 $custom-secondary-palette: (
-  50: #FFE0B2,
-  100: #FFB74D,
-  500: #AAC1C0,
-  700: #556060,
+  50: #EEEEEE,
+  100: #EEEEEE,
+  500: #EEEEEE,
+  700: #EEEEEE,
   contrast: (
     50: #000,
     100: #000,
@@ -120,10 +120,10 @@ $custom-secondary-palette: (
 );
 
 $custom-accent-palette: (
-  50: #726794,
-  100: #39496B,
-  500: #726794,
-  700: #392E60,
+  50: #DC5F00,
+  100: #DC5F00,
+  500: #DC5F00,
+  700: #B34E00,
   contrast: (
     50: #000,
     100: #000,
