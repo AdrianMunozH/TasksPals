@@ -16,6 +16,7 @@ export const apiEndpoint = {
     addTodo: `${apiurl}/api/v1/tasks`,
     updateTodo: `${apiurl}/api/v1/tasks`,
     getWeeklyTasksByUserId: `${apiurl}/api/v1/tasks/weekly`,
+    isCompleted: `${apiurl}/api/v1/tasks`,
 
   },
 };

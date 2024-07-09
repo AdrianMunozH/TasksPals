@@ -110,4 +110,21 @@ export class TodoService {
     );
   }
 
+  updateCompleted(id: number,completed: boolean, authService: AuthService): Observable<IResponse<ITodo>> {
+    let headers = new HttpHeaders().set('Content-Type', 'application/json');
+
+    // Überprüfen, ob authService.user vorhanden ist und ein Token enthält
+    if (authService.user && this.tokenService.getToken()) {
+      // Hinzufügen des JWT-Tokens zum Authorization-Header
+      headers = headers.set('Authorization', `Bearer ${this.tokenService.getToken()}`);
+    }
+
+    return this.http.put<ITodo>(
+        `${apiEndpoint.TodoEndpoint.isCompleted}/${id}?isCompleted=${completed}`,
+        null,
+        { headers: headers }
+      ).pipe(
+        map(updatedTodo => ({ data: updatedTodo }))
+      );
+  }
 }

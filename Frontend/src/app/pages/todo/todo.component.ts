@@ -57,6 +57,7 @@ export class TodoComponent implements OnInit {
   ngOnInit(): void {
     this.getWeeklyTasksByUserId();
   }
+
   getDayByString(date: string): string {
     const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
     const d = new Date(date);
@@ -88,11 +89,13 @@ export class TodoComponent implements OnInit {
   }
 
   updateIsCompleted(completed: boolean, index: number) {
-    if(index >= 0 && this.todos.length >= 0) {
-
-      this.todos[index].completed = completed;
-    }
-
+    if (index < 0 || index >= this.todos.length) return;
+    this.todos[index].completed = completed;
+    this.todoService.updateCompleted(this.todos[index].id, completed, this.authService).subscribe({
+      next: (response) => {
+        console.log(response);
+      }
+    });
   }
 
   sortByDay(tasks: ITodo[]) {
@@ -172,6 +175,7 @@ export class TodoComponent implements OnInit {
 
   onCloseSlidePanel() {
     this.isSlidePanelOpen = false;
+    this.resetForm();
   }
 
   onFilterByStatus(status: string) {
@@ -203,13 +207,22 @@ export class TodoComponent implements OnInit {
     }
   }
 
+  resetForm() {
+        this.todoForm.patchValue({
+          title: '',
+          description: '',
+          taskType: 'ONCE',
+          taskDate: ''
+        });
+    }
+
   onLoadTodoForm(item: ITodo) {
     this.todoId = item.id!!;
     this.todoForm.patchValue({
       title: item.title,
       description: item.description,
       taskType: item.taskType,
-      taskDate: item.date
+      taskDate: item.taskDate
     });
     this.openSlidePanel();
   }
